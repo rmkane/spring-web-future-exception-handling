@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/site.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script defer>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.hljs) {
+          window.hljs.highlightAll();
+          if (window.hljs.initLineNumbersOnLoad) {
+            window.hljs.initLineNumbersOnLoad();
+          }
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Spring Web App</h1>
+      <p class="muted">Welcome! Explore the API endpoints below.</p>
+
+      <div class="links">
+        <a href="/api">API root</a>
+        <a href="/api/v1">API v1</a>
+        <a href="/api/v1/greeting">Greeting (v1)</a>
+      </div>
+
+      <p>Try POSTing JSON to <code>/api/v1/search</code>, e.g. with curl:</p>
+      <pre><code class="language-bash">curl -X POST http://localhost:8080/api/v1/search \
+  -H 'Content-Type: application/json' \
+  -d '{"term":"foo"}'
+    </code></pre>
+    </div>
+  </body>
+</html>
