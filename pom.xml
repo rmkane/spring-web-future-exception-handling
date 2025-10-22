@@ -52,13 +52,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!-- Ignore integration test sources by @Tag("integration") -->
                 <configuration>
-                    <includes>
-                        <include>src/test/java/**/*Test.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>src/integration/test/java/**/*Test.java</exclude>
-                    </excludes>
+                    <excludedGroups>integration</excludedGroups>
                 </configuration>
             </plugin>
 
