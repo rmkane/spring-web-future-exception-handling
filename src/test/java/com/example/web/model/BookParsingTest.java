@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.web.model.book.Book;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
 import java.io.InputStream;
@@ -45,6 +46,7 @@ class BookParsingTest {
       Book book = (Book) unmarshaller.unmarshal(xml);
 
       ObjectMapper mapper = new ObjectMapper();
+      mapper.registerModule(new JavaTimeModule());
       Book expected = mapper.readValue(json, Book.class);
 
       assertEquals(expected, book);

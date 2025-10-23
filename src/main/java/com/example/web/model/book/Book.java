@@ -1,5 +1,7 @@
 package com.example.web.model.book;
 
+import com.example.web.model.book.adapter.LocalDateAdapter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -9,6 +11,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,7 +39,8 @@ import lombok.NoArgsConstructor;
       "physical",
       "chapters",
       "quotes",
-      "rights"
+      "rights",
+      "publishDate"
     })
 @Schema(name = "Book", description = "Book metadata, content, and rights information")
 public class Book {
@@ -96,6 +100,12 @@ public class Book {
   @XmlElement(name = "Rights", namespace = "http://example.com/book")
   @Schema(description = "Copyright and rights information")
   private RightsType rights;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  @XmlElement(name = "PublishDate", namespace = "http://example.com/book")
+  @XmlJavaTypeAdapter(LocalDateAdapter.class)
+  @Schema(description = "Publication date (ISO-8601)", example = "1605-01-16")
+  private LocalDate publishDate;
 
   @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
   @Schema(description = "RFC 5646 language tag for the document", example = "en")
