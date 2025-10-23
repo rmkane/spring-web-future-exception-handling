@@ -1,8 +1,8 @@
 package com.example.web.service.impl;
 
 import com.example.web.exception.SearchException;
-import com.example.web.search.SearchQuery;
-import com.example.web.search.SearchResult;
+import com.example.web.model.search.SearchQuery;
+import com.example.web.model.search.SearchResult;
 import com.example.web.service.SearchService;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

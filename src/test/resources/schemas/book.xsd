@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://example.com/book"
+  xmlns="http://example.com/book"
+  xmlns:xml="http://www.w3.org/XML/1998/namespace"
+  xmlns:bk="http://example.com/book"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+
+  <!-- Import XML namespace so xml:lang is referenceable -->
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+
+  <!-- =========================
+       Common simple types
+  ========================== -->
+
+  <!-- Version like 1 or 1.0 or 1.2.3 -->
+  <xs:simpleType name="VersionString">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d+(\.\d+)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Four-digit year -->
+  <xs:simpleType name="Year">
+    <xs:restriction base="xs:gYear"/>
+  </xs:simpleType>
+
+  <!-- Positive page count -->
+  <xs:simpleType name="Pages">
+    <xs:restriction base="xs:positiveInteger"/>
+  </xs:simpleType>
+
+  <!-- Chapter number (1..n) -->
+  <xs:simpleType name="ChapterNumber">
+    <xs:restriction base="xs:positiveInteger"/>
+  </xs:simpleType>
+
+  <!-- Optional: accept common ISBN-10/13 with hyphens/spaces -->
+  <xs:simpleType name="ISBNType">
+    <xs:restriction base="xs:string">
+      <!-- Very permissive; adjust if you want strict checks -->
+      <xs:pattern value="\s*(97(8|9)[-\s]?\d{1,5}[-\s]?\d{1,7}[-\s]?\d{1,7}[-\s]?[\dXx]|[\d]{1,5}[-\s]?[\d]{1,7}[-\s]?[\d]{1,7}[-\s]?[\dXx])\s*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Format enumeration (extend as needed) -->
+  <xs:simpleType name="FormatType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Paperback"/>
+      <xs:enumeration value="Hardcover"/>
+      <xs:enumeration value="eBook"/>
+      <xs:enumeration value="Audiobook"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- =========================
+       Complex types
+  ========================== -->
+
+  <xs:complexType name="AuthorType">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="BirthYear" type="Year" minOccurs="0"/>
+      <xs:element name="DeathYear" type="Year" minOccurs="0"/>
+      <xs:element name="Nationality" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TranslatorType">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PublisherType">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="Location" type="xs:string" minOccurs="0"/>
+      <xs:element name="Year" type="Year" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IdentifiersType">
+    <xs:sequence>
+      <xs:element name="ISBN" type="ISBNType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SubjectsType">
+    <xs:sequence>
+      <xs:element name="Subject" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PhysicalType">
+    <xs:sequence>
+      <xs:element name="Format" type="FormatType"/>
+      <xs:element name="Pages" type="Pages"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ChapterType">
+    <xs:sequence>
+      <xs:element name="Summary" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="number" type="ChapterNumber" use="required"/>
+    <xs:attribute name="title" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ChaptersType">
+    <xs:sequence>
+      <xs:element name="Chapter" type="ChapterType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="QuotesType">
+    <xs:sequence>
+      <xs:element name="Quote" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CopyrightType">
+    <xs:sequence>
+      <xs:element name="Holder" type="xs:string"/>
+      <xs:element name="Year" type="Year"/>
+      <xs:element name="Notice" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="RightsType">
+    <xs:sequence>
+      <xs:element name="Copyright" type="CopyrightType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- =========================
+       Root: Book
+  ========================== -->
+
+  <xs:element name="Book" type="BookType">
+    <!-- Uniqueness constraint: Chapter @number must be unique -->
+    <xs:unique name="uniqueChapterNumber">
+      <xs:selector xpath="bk:Chapters/bk:Chapter"/>
+      <xs:field xpath="@number"/>
+    </xs:unique>
+
+    <!-- Optional: uniqueness for Chapter titles (remove if not desired) -->
+    <xs:unique name="uniqueChapterTitle">
+      <xs:selector xpath="bk:Chapters/bk:Chapter"/>
+      <xs:field xpath="@title"/>
+    </xs:unique>
+  </xs:element>
+
+  <xs:complexType name="BookType">
+    <xs:sequence>
+      <xs:element name="Title" type="xs:string"/>
+      <xs:element name="Subtitle" type="xs:string" minOccurs="0"/>
+      <xs:element name="Author" type="AuthorType"/>
+      <xs:element name="Translator" type="TranslatorType" minOccurs="0"/>
+      <xs:element name="Publisher" type="PublisherType"/>
+      <xs:element name="Identifiers" type="IdentifiersType" minOccurs="0"/>
+      <xs:element name="Language" type="xs:string"/>
+      <xs:element name="OriginalLanguage" type="xs:string" minOccurs="0"/>
+      <xs:element name="Description" type="xs:string" minOccurs="0"/>
+      <xs:element name="Subjects" type="SubjectsType" minOccurs="0"/>
+      <xs:element name="Physical" type="PhysicalType" minOccurs="0"/>
+      <xs:element name="Chapters" type="ChaptersType"/>
+      <xs:element name="Quotes" type="QuotesType" minOccurs="0"/>
+      <xs:element name="Rights" type="RightsType" minOccurs="0"/>
+    </xs:sequence>
+
+    <!-- Attributes on Book -->
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute name="id" type="xs:ID" use="optional"/>
+    <xs:attribute name="version" type="VersionString" use="optional"/>
+
+  </xs:complexType>
+
+</xs:schema>

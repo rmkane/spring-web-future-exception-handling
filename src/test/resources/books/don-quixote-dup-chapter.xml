@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Book xmlns="http://example.com/book" xml:lang="en">
+  <Title>Don Quixote</Title>
+  <Author><Name>Miguel de Cervantes Saavedra</Name></Author>
+  <Publisher><Name>Penguin Classics</Name></Publisher>
+  <Language>English</Language>
+  <Chapters>
+    <Chapter number="1" title="One"/>
+    <Chapter number="1" title="Duplicate Number"/> <!-- should fail -->
+  </Chapters>
+</Book>

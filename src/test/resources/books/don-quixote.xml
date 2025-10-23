@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Book
+  xmlns="http://example.com/book"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://example.com/book https://example.com/schemas/book-1.0.xsd"
+  xml:lang="en"
+  id="bk-don-quixote"
+  version="1.0">
+
+  <Title>Don Quixote</Title>
+  <Subtitle>The Ingenious Gentleman of La Mancha</Subtitle>
+  <Author>
+    <Name>Miguel de Cervantes Saavedra</Name>
+    <BirthYear>1547</BirthYear>
+    <DeathYear>1616</DeathYear>
+    <Nationality>Spanish</Nationality>
+  </Author>
+
+  <Translator>
+    <Name>John Ormsby</Name>
+  </Translator>
+
+  <Publisher>
+    <Name>Penguin Classics</Name>
+    <Location>London</Location>
+    <Year>2003</Year>
+  </Publisher>
+
+  <Identifiers>
+    <ISBN>978-0-14-243723-0</ISBN>
+  </Identifiers>
+
+  <Language>English</Language>
+  <OriginalLanguage>Spanish</OriginalLanguage>
+
+  <Description>
+    Don Quixote, a Spanish nobleman driven mad by chivalric romances, sets out with his squire Sancho Panza to revive knighthood and right the world's wrongs. Their adventures, both comic and tragic, form one of the greatest works of world literature.
+  </Description>
+
+  <Subjects>
+    <Subject>Classic Literature</Subject>
+    <Subject>Satire</Subject>
+    <Subject>Adventure</Subject>
+  </Subjects>
+
+  <Physical>
+    <Format>Paperback</Format>
+    <Pages>992</Pages>
+  </Physical>
+
+  <Chapters>
+    <Chapter number="1" title="The Character of Don Quixote and His First Adventure">
+      <Summary>Introduces Alonso Quixano, who renames himself Don Quixote and sets out as a knight-errant.</Summary>
+    </Chapter>
+
+    <Chapter number="2" title="Don Quixote's First Sally">
+      <Summary>Don Quixote leaves home, meets an innkeeper he takes for a castle lord, and is dubbed a knight.</Summary>
+    </Chapter>
+
+    <Chapter number="3" title="The Windmill Adventure">
+      <Summary>Don Quixote mistakes windmills for giants and attacks them, leading to one of the novel's most famous scenes.</Summary>
+    </Chapter>
+
+    <Chapter number="4" title="The Meeting with Sancho Panza">
+      <Summary>Don Quixote persuades his neighbor, Sancho Panza, to become his squire, promising him an island to govern.</Summary>
+    </Chapter>
+  </Chapters>
+
+  <Quotes>
+    <Quote>The truth may be stretched thin, but it never breaks, and it always surfaces above lies, as oil floats on water.</Quote>
+    <Quote>When life itself seems lunatic, who knows where madness lies?</Quote>
+  </Quotes>
+
+  <Rights>
+    <Copyright>
+      <Holder>Penguin Books Ltd.</Holder>
+      <Year>2003</Year>
+      <Notice>All rights reserved.</Notice>
+    </Copyright>
+  </Rights>
+
+</Book>

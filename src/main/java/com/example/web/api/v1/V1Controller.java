@@ -1,5 +1,6 @@
 package com.example.web.api.v1;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Hidden
 @RequestMapping(path = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 public class V1Controller {
 

@@ -1,46 +1,32 @@
 package com.example.web.components;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Component
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
+  private final WebServerApplicationContext webServerApplicationContext;
+  private final Environment environment;
 
-  @Value("${server.port:8080}")
-  private int port;
+  public ApplicationStartup(
+      WebServerApplicationContext webServerApplicationContext, Environment environment) {
+    this.webServerApplicationContext = webServerApplicationContext;
+    this.environment = environment;
+  }
 
-  @Value("${server.address:}")
-  private String serverAddress;
-
-  @Value("${server.ssl.enabled:false}")
-  private boolean sslEnabled;
-
-  /**
-   * This event is executed as late as conceivably possible to indicate that the application is
-   * ready to service requests.
-   */
   @Override
   public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-    String url = getApplicationUrl(serverAddress, port, sslEnabled);
-    System.out.printf("%n%nApplication running on: %s%n%n", url);
-  }
-
-  private String getApplicationUrl(String serverAddress, int port, boolean sslEnabled) {
-    String addressForUrl = getAddressForUrl(serverAddress);
+    int port = webServerApplicationContext.getWebServer().getPort();
+    boolean sslEnabled = environment.getProperty("server.ssl.enabled", Boolean.class, false);
     String protocol = sslEnabled ? "https" : "http";
-    return String.format("%s://%s:%d", protocol, addressForUrl, port);
-  }
-
-  private String getAddressForUrl(String serverAddress) {
-    if (!StringUtils.hasText(serverAddress)
-        || "0.0.0.0".equals(serverAddress)
-        || "::".equals(serverAddress)) {
-      return "localhost";
-    }
-    return serverAddress;
+    String address = environment.getProperty("server.address", "localhost");
+    String host = "0.0.0.0".equals(address) || "::".equals(address) ? "localhost" : address;
+    String contextPath = environment.getProperty("server.servlet.context-path", "");
+    String baseUrl = protocol + "://" + host + ":" + port + contextPath;
+    System.out.printf("%n\t>> Application is running at: %s%n%n", baseUrl);
   }
 }
