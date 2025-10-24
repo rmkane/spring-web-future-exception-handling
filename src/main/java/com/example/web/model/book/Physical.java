@@ -16,10 +16,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
-    name = "IdentifiersType",
-    propOrder = {"isbn"})
-@Schema(name = "Identifiers", description = "Identifier set such as ISBN")
-public class IdentifiersType {
-  @XmlElement(name = "ISBN", namespace = "http://example.com/book", required = true)
-  private String isbn;
+    name = "Physical",
+    propOrder = {"format", "pages"})
+@Schema(name = "Physical", description = "Physical characteristics of the book")
+public class Physical {
+  @XmlElement(name = "Format", namespace = "http://example.com/book", required = true)
+  private String format;
+
+  @XmlElement(name = "Pages", namespace = "http://example.com/book", required = true)
+  private Integer pages;
 }

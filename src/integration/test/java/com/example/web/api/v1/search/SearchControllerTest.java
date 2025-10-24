@@ -23,7 +23,7 @@ final class SearchControllerTest extends BaseControllerTest {
     String body = objectMapper.writeValueAsString(Map.of("term", "foo"));
     RestFetcher fetcher = new RestFetcher();
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080", "/api/v1/search")
+        RestRequestBuilder.create(BASE_URL, "/api/v1/search")
             .method(HttpMethod.POST)
             .headers(getDefaultHeaders())
             .body(body)

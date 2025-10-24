@@ -20,7 +20,7 @@ final class GreetingControllerTest extends BaseControllerTest {
   void testRootReturnsHelloFromApiV1() throws IOException {
     RestFetcher fetcher = new RestFetcher();
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080", "/api/v1/greeting")
+        RestRequestBuilder.create(BASE_URL, "/api/v1/greeting")
             .headers(getDefaultHeaders())
             .build();
     ResponseEntity<String> response = fetcher.exchange(request, String.class);

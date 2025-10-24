@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
-    name = "CopyrightType",
+    name = "Copyright",
     propOrder = {"holder", "year", "notice"})
 @Schema(name = "Copyright", description = "Copyright holder, year and notice")
-public class CopyrightType {
+public class Copyright {
   @XmlElement(name = "Holder", namespace = "http://example.com/book", required = true)
   private String holder;
 

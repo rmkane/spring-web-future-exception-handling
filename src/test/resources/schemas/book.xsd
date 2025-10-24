@@ -164,10 +164,28 @@
       <xs:element name="Language" type="xs:string"/>
       <xs:element name="OriginalLanguage" type="xs:string" minOccurs="0"/>
       <xs:element name="Description" type="xs:string" minOccurs="0"/>
-      <xs:element name="Subjects" type="SubjectsType" minOccurs="0"/>
+      <xs:element name="Subjects" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Subject" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="Physical" type="PhysicalType" minOccurs="0"/>
-      <xs:element name="Chapters" type="ChaptersType"/>
-      <xs:element name="Quotes" type="QuotesType" minOccurs="0"/>
+      <xs:element name="Chapters">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Chapter" type="ChapterType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Quotes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Quote" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="Rights" type="RightsType" minOccurs="0"/>
       <xs:element name="PublishDate" type="xs:date" minOccurs="0"/>
     </xs:sequence>

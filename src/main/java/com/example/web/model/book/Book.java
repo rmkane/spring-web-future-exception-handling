@@ -7,11 +7,13 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +26,7 @@ import lombok.NoArgsConstructor;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "Book", namespace = "http://example.com/book")
 @XmlType(
-    name = "BookType",
+    name = "Book",
     propOrder = {
       "title",
       "subtitle",
@@ -54,19 +56,19 @@ public class Book {
 
   @XmlElement(name = "Author", namespace = "http://example.com/book", required = true)
   @Schema(description = "Primary author metadata")
-  private AuthorType author;
+  private Author author;
 
   @XmlElement(name = "Translator", namespace = "http://example.com/book")
   @Schema(description = "Translator information if applicable")
-  private TranslatorType translator;
+  private Translator translator;
 
   @XmlElement(name = "Publisher", namespace = "http://example.com/book", required = true)
   @Schema(description = "Publisher information")
-  private PublisherType publisher;
+  private Publisher publisher;
 
   @XmlElement(name = "Identifiers", namespace = "http://example.com/book")
   @Schema(description = "External identifiers e.g., ISBN")
-  private IdentifiersType identifiers;
+  private Identifiers identifiers;
 
   @XmlElement(name = "Language", namespace = "http://example.com/book", required = true)
   @Schema(description = "Language of the book text", example = "English")
@@ -81,25 +83,28 @@ public class Book {
   @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
   private String description;
 
-  @XmlElement(name = "Subjects", namespace = "http://example.com/book")
+  @XmlElementWrapper(name = "Subjects", namespace = "http://example.com/book")
+  @XmlElement(name = "Subject", namespace = "http://example.com/book")
   @Schema(description = "Subject tags/categories")
-  private SubjectsType subjects;
+  private List<String> subjects;
 
   @XmlElement(name = "Physical", namespace = "http://example.com/book")
   @Schema(description = "Physical characteristics like format and page count")
-  private PhysicalType physical;
+  private Physical physical;
 
-  @XmlElement(name = "Chapters", namespace = "http://example.com/book", required = true)
+  @XmlElementWrapper(name = "Chapters", namespace = "http://example.com/book")
+  @XmlElement(name = "Chapter", namespace = "http://example.com/book")
   @Schema(description = "Chapters list")
-  private ChaptersType chapters;
+  private List<Chapter> chapters;
 
-  @XmlElement(name = "Quotes", namespace = "http://example.com/book")
+  @XmlElementWrapper(name = "Quotes", namespace = "http://example.com/book")
+  @XmlElement(name = "Quote", namespace = "http://example.com/book")
   @Schema(description = "Selected notable quotes")
-  private QuotesType quotes;
+  private List<String> quotes;
 
   @XmlElement(name = "Rights", namespace = "http://example.com/book")
   @Schema(description = "Copyright and rights information")
-  private RightsType rights;
+  private Rights rights;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   @XmlElement(name = "PublishDate", namespace = "http://example.com/book")

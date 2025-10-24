@@ -17,10 +17,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
-    name = "ChapterType",
+    name = "Chapter",
     propOrder = {"summary"})
 @Schema(name = "Chapter", description = "Single chapter metadata")
-public class ChapterType {
+public class Chapter {
   @XmlElement(name = "Summary", namespace = "http://example.com/book")
   private String summary;
 

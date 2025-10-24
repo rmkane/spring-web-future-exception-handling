@@ -16,10 +16,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
-    name = "TranslatorType",
-    propOrder = {"name"})
-@Schema(name = "Translator", description = "Translator details")
-public class TranslatorType {
+    name = "Author",
+    propOrder = {"name", "birthYear", "deathYear", "nationality"})
+@Schema(name = "Author", description = "Author biographical metadata")
+public class Author {
   @XmlElement(name = "Name", namespace = "http://example.com/book", required = true)
   private String name;
+
+  @XmlElement(name = "BirthYear", namespace = "http://example.com/book")
+  private Integer birthYear;
+
+  @XmlElement(name = "DeathYear", namespace = "http://example.com/book")
+  private Integer deathYear;
+
+  @XmlElement(name = "Nationality", namespace = "http://example.com/book")
+  private String nationality;
 }

@@ -8,18 +8,24 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
 import java.io.InputStream;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class BookParsingTest {
+  private static ObjectMapper mapper;
+
+  @BeforeAll
+  static void setUp() {
+    mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+  }
 
   @Test
   void unmarshals_book_xml_to_pojo() throws Exception {
     try (InputStream in = getClass().getResourceAsStream("/books/don-quixote.xml")) {
       assertNotNull(in, "XML resource not found");
 
-      JAXBContext context = JAXBContext.newInstance("com.example.web.model.book");
-      Unmarshaller unmarshaller = context.createUnmarshaller();
-      Book book = (Book) unmarshaller.unmarshal(in);
+      Book book = unmarshal(in, Book.class);
 
       assertNotNull(book);
       assertEquals("Don Quixote", book.getTitle());
@@ -29,8 +35,7 @@ class BookParsingTest {
       assertEquals("bk-don-quixote", book.getId());
       assertEquals("1.0", book.getVersion());
       assertNotNull(book.getChapters());
-      assertNotNull(book.getChapters().getChapter());
-      assertFalse(book.getChapters().getChapter().isEmpty());
+      assertEquals(4, book.getChapters().size());
     }
   }
 
@@ -41,15 +46,17 @@ class BookParsingTest {
       assertNotNull(xml, "XML resource not found");
       assertNotNull(json, "JSON resource not found");
 
-      JAXBContext context = JAXBContext.newInstance("com.example.web.model.book");
-      Unmarshaller unmarshaller = context.createUnmarshaller();
-      Book book = (Book) unmarshaller.unmarshal(xml);
-
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.registerModule(new JavaTimeModule());
+      Book book = unmarshal(xml, Book.class);
       Book expected = mapper.readValue(json, Book.class);
 
       assertEquals(expected, book);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E> E unmarshal(InputStream in, Class<E> clazz) throws Exception {
+    JAXBContext context = JAXBContext.newInstance(clazz);
+    Unmarshaller unmarshaller = context.createUnmarshaller();
+    return (E) unmarshaller.unmarshal(in);
   }
 }

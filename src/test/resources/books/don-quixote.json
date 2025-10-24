@@ -21,47 +21,41 @@
   "language": "English",
   "originalLanguage": "Spanish",
   "description": "Don Quixote, a Spanish nobleman driven mad by chivalric romances, sets out with his squire Sancho Panza to revive knighthood and right the world's wrongs. Their adventures, both comic and tragic, form one of the greatest works of world literature.",
-  "subjects": {
-    "subject": [
-      "Classic Literature",
-      "Satire",
-      "Adventure"
-    ]
-  },
+  "subjects": [
+    "Classic Literature",
+    "Satire",
+    "Adventure"
+  ],
   "physical": {
     "format": "Paperback",
     "pages": 992
   },
-  "chapters": {
-    "chapter": [
-      {
-        "summary": "Introduces Alonso Quixano, who renames himself Don Quixote and sets out as a knight-errant.",
-        "number": 1,
-        "title": "The Character of Don Quixote and His First Adventure"
-      },
-      {
-        "summary": "Don Quixote leaves home, meets an innkeeper he takes for a castle lord, and is dubbed a knight.",
-        "number": 2,
-        "title": "Don Quixote's First Sally"
-      },
-      {
-        "summary": "Don Quixote mistakes windmills for giants and attacks them, leading to one of the novel's most famous scenes.",
-        "number": 3,
-        "title": "The Windmill Adventure"
-      },
-      {
-        "summary": "Don Quixote persuades his neighbor, Sancho Panza, to become his squire, promising him an island to govern.",
-        "number": 4,
-        "title": "The Meeting with Sancho Panza"
-      }
-    ]
-  },
-  "quotes": {
-    "quote": [
-      "The truth may be stretched thin, but it never breaks, and it always surfaces above lies, as oil floats on water.",
-      "When life itself seems lunatic, who knows where madness lies?"
-    ]
-  },
+  "chapters": [
+    {
+      "summary": "Introduces Alonso Quixano, who renames himself Don Quixote and sets out as a knight-errant.",
+      "number": 1,
+      "title": "The Character of Don Quixote and His First Adventure"
+    },
+    {
+      "summary": "Don Quixote leaves home, meets an innkeeper he takes for a castle lord, and is dubbed a knight.",
+      "number": 2,
+      "title": "Don Quixote's First Sally"
+    },
+    {
+      "summary": "Don Quixote mistakes windmills for giants and attacks them, leading to one of the novel's most famous scenes.",
+      "number": 3,
+      "title": "The Windmill Adventure"
+    },
+    {
+      "summary": "Don Quixote persuades his neighbor, Sancho Panza, to become his squire, promising him an island to govern.",
+      "number": 4,
+      "title": "The Meeting with Sancho Panza"
+    }
+  ],
+  "quotes": [
+    "The truth may be stretched thin, but it never breaks, and it always surfaces above lies, as oil floats on water.",
+    "When life itself seems lunatic, who knows where madness lies?"
+  ],
   "rights": {
     "copyright": {
       "holder": "Penguin Books Ltd.",

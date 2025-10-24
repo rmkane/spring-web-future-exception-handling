@@ -5,7 +5,6 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
-    name = "SubjectsType",
-    propOrder = {"subject"})
-@Schema(name = "Subjects", description = "List of subject tags")
-public class SubjectsType {
-  @XmlElement(name = "Subject", namespace = "http://example.com/book")
-  private List<String> subject;
+    name = "Translator",
+    propOrder = {"name"})
+@Schema(name = "Translator", description = "Translator details")
+public class Translator {
+  @XmlElement(name = "Name", namespace = "http://example.com/book", required = true)
+  private String name;
 }
