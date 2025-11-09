@@ -1,12 +1,17 @@
 package com.example.integration;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -21,6 +26,8 @@ public final class RestRequestBuilder {
   private final Map<String, String> queryParams = new LinkedHashMap<>();
   private final Map<String, Object> pathVariables = new LinkedHashMap<>();
   @Nullable private byte[] body;
+  @Nullable private String fileName;
+  @Nullable private byte[] fileData;
 
   public static RestRequestBuilder create(String baseUrl) {
     RestRequestBuilder b = new RestRequestBuilder();
@@ -101,6 +108,22 @@ public final class RestRequestBuilder {
     return this;
   }
 
+  public RestRequestBuilder file(String name, byte[] bytes) {
+    if (name != null && bytes != null) {
+      this.fileName = name;
+      this.fileData = bytes;
+    }
+    return this;
+  }
+
+  public RestRequestBuilder file(File file) throws IOException {
+    if (file != null) {
+      this.fileName = file.getName();
+      this.fileData = Files.readAllBytes(file.toPath());
+    }
+    return this;
+  }
+
   public RestRequest build() {
     UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUrl);
     if (endpoint != null && !endpoint.isEmpty()) {
@@ -114,6 +137,22 @@ public final class RestRequestBuilder {
             : uriBuilder.buildAndExpand(pathVariables).encode().toUri();
     HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.addAll(this.headers);
+
+    // Handle multipart form data
+    if (this.fileData != null) {
+      MultiValueMap<String, Object> formBody = new LinkedMultiValueMap<>();
+      ByteArrayResource resource =
+          new ByteArrayResource(this.fileData) {
+            @Override
+            public String getFilename() {
+              return fileName != null ? fileName : "file";
+            }
+          };
+      formBody.add("file", resource);
+      httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+      return new RestRequest(uri, method, httpHeaders, null, formBody);
+    }
+
     return new RestRequest(uri, method, httpHeaders, body);
   }
 }

@@ -3,6 +3,7 @@ package com.example.integration;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /** Utility to execute {@link RestRequest} using {@link RestTemplate}. */
@@ -18,13 +19,31 @@ public final class RestFetcher {
   }
 
   public <T> ResponseEntity<T> exchange(RestRequest request, Class<T> responseType) {
-    HttpEntity<byte[]> entity = new HttpEntity<>(request.getBody(), request.getHeaders());
-    return restTemplate.exchange(request.getURI(), request.getMethod(), entity, responseType);
+    try {
+      HttpEntity<?> entity;
+      if (request.isMultipart()) {
+        entity = new HttpEntity<>(request.getMultipartBody(), request.getHeaders());
+      } else {
+        entity = new HttpEntity<>(request.getBody(), request.getHeaders());
+      }
+      return restTemplate.exchange(request.getURI(), request.getMethod(), entity, responseType);
+    } catch (HttpClientErrorException e) {
+      return ResponseEntity.status(e.getStatusCode().value()).body((T) e.getResponseBodyAsString());
+    }
   }
 
   public <T> ResponseEntity<T> exchange(
       RestRequest request, ParameterizedTypeReference<T> responseType) {
-    HttpEntity<byte[]> entity = new HttpEntity<>(request.getBody(), request.getHeaders());
-    return restTemplate.exchange(request.getURI(), request.getMethod(), entity, responseType);
+    try {
+      HttpEntity<?> entity;
+      if (request.isMultipart()) {
+        entity = new HttpEntity<>(request.getMultipartBody(), request.getHeaders());
+      } else {
+        entity = new HttpEntity<>(request.getBody(), request.getHeaders());
+      }
+      return restTemplate.exchange(request.getURI(), request.getMethod(), entity, responseType);
+    } catch (HttpClientErrorException e) {
+      return ResponseEntity.status(e.getStatusCode().value()).body((T) e.getResponseBodyAsString());
+    }
   }
 }

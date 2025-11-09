@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
 
 /** Immutable HTTP request for integration tests. */
 public final class RestRequest implements HttpRequest {
@@ -16,12 +17,27 @@ public final class RestRequest implements HttpRequest {
   private final HttpMethod method;
   private final HttpHeaders headers;
   @Nullable private final byte[] body;
+  @Nullable private final MultiValueMap<String, Object> multipartBody;
 
   RestRequest(URI uri, HttpMethod method, HttpHeaders headers, @Nullable byte[] body) {
     this.uri = uri;
     this.method = method;
     this.headers = HttpHeaders.readOnlyHttpHeaders(headers);
     this.body = body;
+    this.multipartBody = null;
+  }
+
+  RestRequest(
+      URI uri,
+      HttpMethod method,
+      HttpHeaders headers,
+      @Nullable byte[] body,
+      @Nullable MultiValueMap<String, Object> multipartBody) {
+    this.uri = uri;
+    this.method = method;
+    this.headers = HttpHeaders.readOnlyHttpHeaders(headers);
+    this.body = body;
+    this.multipartBody = multipartBody;
   }
 
   @NonNull
@@ -60,5 +76,16 @@ public final class RestRequest implements HttpRequest {
 
   public Optional<String> getBodyAsString(Charset charset) {
     return body == null ? Optional.empty() : Optional.of(new String(body, charset));
+  }
+
+  /** Multipart form data body, or {@code null} if not a multipart request. */
+  @Nullable
+  public MultiValueMap<String, Object> getMultipartBody() {
+    return multipartBody;
+  }
+
+  /** Returns {@code true} if this is a multipart form data request. */
+  public boolean isMultipart() {
+    return multipartBody != null;
   }
 }
