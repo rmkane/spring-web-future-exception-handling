@@ -19,7 +19,11 @@ public final class RestRequest implements HttpRequest {
   @Nullable private final byte[] body;
   @Nullable private final MultiValueMap<String, Object> multipartBody;
 
-  RestRequest(URI uri, HttpMethod method, HttpHeaders headers, @Nullable byte[] body) {
+  RestRequest(
+      @NonNull URI uri,
+      @NonNull HttpMethod method,
+      @NonNull HttpHeaders headers,
+      @Nullable byte[] body) {
     this.uri = uri;
     this.method = method;
     this.headers = HttpHeaders.readOnlyHttpHeaders(headers);
@@ -28,9 +32,9 @@ public final class RestRequest implements HttpRequest {
   }
 
   RestRequest(
-      URI uri,
-      HttpMethod method,
-      HttpHeaders headers,
+      @NonNull URI uri,
+      @NonNull HttpMethod method,
+      @NonNull HttpHeaders headers,
       @Nullable MultiValueMap<String, Object> multipartBody) {
     this.uri = uri;
     this.method = method;

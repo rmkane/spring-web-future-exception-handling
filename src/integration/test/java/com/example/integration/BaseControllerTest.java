@@ -1,29 +1,30 @@
 package com.example.integration;
 
 import com.example.integration.request.HeadersBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.integration.request.RestFetcher;
+import com.example.integration.util.ResourceLoader;
+import com.example.integration.util.ResponseWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 public abstract class BaseControllerTest {
   protected static final String BASE_URL = "http://localhost:8080";
 
-  private static final Path OUTPUT_DIR = Path.of("target/integration");
-
   protected static ObjectMapper objectMapper;
+  protected static RestFetcher restFetcher;
 
   @BeforeAll
   static void setUp() {
     objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
+    // Reuse a single RestTemplate instance across all tests (thread-safe)
+    restFetcher = new RestFetcher(new RestTemplate());
   }
 
   protected MultiValueMap<String, String> getDefaultHeaders() {
@@ -33,29 +34,22 @@ public abstract class BaseControllerTest {
   }
 
   protected byte[] loadResource(String fileName) throws IOException {
-    return getClass().getResourceAsStream(fileName).readAllBytes();
+    return ResourceLoader.loadBytes(getClass(), fileName);
   }
 
   protected String loadResourceAsString(String fileName) throws IOException {
-    return new String(loadResource(fileName), StandardCharsets.UTF_8);
+    return ResourceLoader.loadString(getClass(), fileName);
   }
 
   protected void writeJsonResponse(String response, String fileName) throws IOException {
-    writeResponse(formatJson(response), fileName);
+    ResponseWriter.writeJson(objectMapper, response, fileName);
   }
 
   protected void writeJsonResponse(Object response, String fileName) throws IOException {
-    writeResponse(formatJson(objectMapper.writeValueAsString(response)), fileName);
+    ResponseWriter.writeJson(objectMapper, response, fileName);
   }
 
   protected void writeResponse(String response, String fileName) throws IOException {
-    Files.createDirectories(OUTPUT_DIR);
-    Files.writeString(OUTPUT_DIR.resolve(fileName), response, StandardCharsets.UTF_8);
-  }
-
-  private String formatJson(String json) throws JsonProcessingException {
-    return objectMapper
-        .writerWithDefaultPrettyPrinter()
-        .writeValueAsString(objectMapper.readValue(json, Object.class));
+    ResponseWriter.write(response, fileName);
   }
 }

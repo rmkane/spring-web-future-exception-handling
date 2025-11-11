@@ -3,7 +3,6 @@ package com.example.web.api.v1.greeting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.example.integration.BaseControllerTest;
-import com.example.integration.request.RestFetcher;
 import com.example.integration.request.RestRequest;
 import com.example.integration.request.RestRequestBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -18,12 +17,11 @@ import org.springframework.http.ResponseEntity;
 final class GreetingControllerTest extends BaseControllerTest {
   @Test
   void testRootReturnsHelloFromApiV1() throws IOException {
-    RestFetcher fetcher = new RestFetcher();
     RestRequest request =
         RestRequestBuilder.create(BASE_URL, "/api/v1/greeting")
             .headers(getDefaultHeaders())
             .build();
-    ResponseEntity<String> response = fetcher.fetch(request, String.class);
+    ResponseEntity<String> response = restFetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     writeJsonResponse(response.getBody(), "greeting_returnsHelloFromApiV1.json");

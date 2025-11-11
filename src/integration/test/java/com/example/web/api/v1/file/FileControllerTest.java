@@ -3,7 +3,6 @@ package com.example.web.api.v1.file;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.example.integration.BaseControllerTest;
-import com.example.integration.request.RestFetcher;
 import com.example.integration.request.RestRequest;
 import com.example.integration.request.RestRequestBuilder;
 import java.io.IOException;
@@ -19,13 +18,12 @@ final class FileControllerTest extends BaseControllerTest {
   void testUploadFile() throws IOException {
 
     String fileName = "test.txt";
-    RestFetcher fetcher = new RestFetcher();
     RestRequest request =
         RestRequestBuilder.create(BASE_URL, "/api/v1/files")
             .method(HttpMethod.POST)
             .file("file", loadResource("/files/" + fileName), fileName)
             .build();
-    ResponseEntity<String> response = fetcher.fetch(request, String.class);
+    ResponseEntity<String> response = restFetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("File uploaded successfully", response.getBody());
@@ -34,13 +32,12 @@ final class FileControllerTest extends BaseControllerTest {
   @Test
   void testUploadMusicFile() throws IOException {
     String fileName = "jazz-background-music-426859.mp3";
-    RestFetcher fetcher = new RestFetcher();
     RestRequest request =
         RestRequestBuilder.create(BASE_URL, "/api/v1/files")
             .method(HttpMethod.POST)
             .file("file", loadResource("/files/" + fileName), fileName)
             .build();
-    ResponseEntity<String> response = fetcher.fetch(request, String.class);
+    ResponseEntity<String> response = restFetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("MP3 file uploaded successfully", response.getBody());

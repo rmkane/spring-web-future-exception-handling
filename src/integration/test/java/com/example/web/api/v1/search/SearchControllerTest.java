@@ -3,7 +3,6 @@ package com.example.web.api.v1.search;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.example.integration.BaseControllerTest;
-import com.example.integration.request.RestFetcher;
 import com.example.integration.request.RestRequest;
 import com.example.integration.request.RestRequestBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,14 +20,13 @@ final class SearchControllerTest extends BaseControllerTest {
   @Test
   void search_returnsResults_forFoo() throws IOException {
     String body = objectMapper.writeValueAsString(Map.of("term", "foo"));
-    RestFetcher fetcher = new RestFetcher();
     RestRequest request =
         RestRequestBuilder.create(BASE_URL, "/api/v1/search")
             .method(HttpMethod.POST)
             .headers(getDefaultHeaders())
             .body(body)
             .build();
-    ResponseEntity<String> response = fetcher.fetch(request, String.class);
+    ResponseEntity<String> response = restFetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     writeJsonResponse(response.getBody(), "search_returnsResults_forFoo.json");
@@ -41,14 +39,13 @@ final class SearchControllerTest extends BaseControllerTest {
   @Test
   void search_returnsNoContent_forError() throws JsonProcessingException {
     String body = objectMapper.writeValueAsString(Map.of("term", "error"));
-    RestFetcher fetcher = new RestFetcher();
     RestRequest request =
         RestRequestBuilder.create("http://localhost:8080", "/api/v1/search")
             .method(HttpMethod.POST)
             .headers(getDefaultHeaders())
             .body(body)
             .build();
-    ResponseEntity<String> response = fetcher.fetch(request, String.class);
+    ResponseEntity<String> response = restFetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
   }
