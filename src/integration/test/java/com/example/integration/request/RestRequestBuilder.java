@@ -1,5 +1,6 @@
 package com.example.integration.request;
 
+import com.example.integration.util.MapUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -59,9 +60,7 @@ public final class RestRequestBuilder {
   }
 
   public RestRequestBuilder addHeader(String name, String value) {
-    if (name != null && value != null) {
-      this.headers.add(name, value);
-    }
+    MapUtils.addIf(this.headers, name, value);
     return this;
   }
 
@@ -71,29 +70,24 @@ public final class RestRequestBuilder {
   }
 
   public RestRequestBuilder pathVar(String name, Object value) {
-    if (name != null && value != null) {
-      this.pathVariables.put(name, value);
-    }
+    MapUtils.putIf(this.pathVariables, name, value);
     return this;
   }
 
   public RestRequestBuilder pathVars(Map<String, ?> variables) {
-    if (variables != null) {
-      variables.forEach(
-          (k, v) -> {
-            if (k != null && v != null) this.pathVariables.put(k, v);
-          });
-    }
+    @SuppressWarnings("unchecked")
+    Map<String, Object> castVariables = (Map<String, Object>) variables;
+    MapUtils.putAllIf(this.pathVariables, castVariables);
     return this;
   }
 
   public RestRequestBuilder queryParam(String name, String value) {
-    if (name != null && value != null) this.queryParams.put(name, value);
+    MapUtils.putIf(this.queryParams, name, value);
     return this;
   }
 
   public RestRequestBuilder queryParams(Map<String, String> params) {
-    if (params != null) this.queryParams.putAll(params);
+    MapUtils.putAllIf(this.queryParams, params);
     return this;
   }
 
@@ -118,17 +112,13 @@ public final class RestRequestBuilder {
 
   /** Add a simple string part. */
   public RestRequestBuilder part(String name, String value) {
-    if (name != null && value != null) {
-      ensureMultipart().add(name, value);
-    }
+    MapUtils.addIf(ensureMultipart(), name, value);
     return this;
   }
 
   /** Add an advanced part (e.g., HttpEntity with custom part headers). */
   public RestRequestBuilder part(String name, Object value) {
-    if (name != null && value != null) {
-      ensureMultipart().add(name, value);
-    }
+    MapUtils.addIf(ensureMultipart(), name, value);
     return this;
   }
 

@@ -1,9 +1,12 @@
 package com.example.integration.request;
 
+import com.example.integration.util.MapUtils;
 import java.util.Collection;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -18,27 +21,25 @@ public final class HeadersBuilder {
   }
 
   public HeadersBuilder addHeader(String name, String value) {
-    if (name != null && value != null) {
-      headers.add(name, value);
-    }
+    MapUtils.addIf(headers, name, value);
     return this;
   }
 
+  public HeadersBuilder addHeaderContentTypeXml() {
+    return addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
+  }
+
+  public HeadersBuilder addHeaderContentTypeJson() {
+    return addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+  }
+
   public HeadersBuilder addAll(String name, Collection<String> values) {
-    if (name != null && values != null) {
-      for (String value : values) {
-        if (value != null) {
-          headers.add(name, value);
-        }
-      }
-    }
+    MapUtils.addAllIf(headers, name, values);
     return this;
   }
 
   public HeadersBuilder put(String name, List<String> values) {
-    if (name != null && values != null) {
-      headers.put(name, List.copyOf(values));
-    }
+    MapUtils.putIf(headers, name, values);
     return this;
   }
 
