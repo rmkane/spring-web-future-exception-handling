@@ -1,5 +1,7 @@
 package com.example.integration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.example.integration.request.HeadersBuilder;
 import com.example.integration.request.RestFetcher;
 import com.example.integration.request.RestRequestBuilder;
@@ -14,6 +16,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -104,6 +107,59 @@ public abstract class BaseControllerTest {
    */
   protected String toJson(Object object) throws JsonProcessingException {
     return objectMapper.writeValueAsString(object);
+  }
+
+  /**
+   * Asserts that the response has the expected status code.
+   *
+   * @param response The response to check
+   * @param expectedStatus The expected HTTP status
+   * @throws AssertionError if the status codes don't match
+   */
+  protected void assertStatus(ResponseEntity<?> response, HttpStatus expectedStatus) {
+    assertEquals(expectedStatus, response.getStatusCode(), "Response status code mismatch");
+  }
+
+  /**
+   * Asserts that the response has status 200 OK.
+   *
+   * @param response The response to check
+   * @throws AssertionError if the status is not OK
+   */
+  protected void assertOk(ResponseEntity<?> response) {
+    assertStatus(response, HttpStatus.OK);
+  }
+
+  /**
+   * Asserts that a JSON response contains a specific value at a given path.
+   *
+   * @param response The JSON response
+   * @param jsonPath The JSON path (e.g., "query.term")
+   * @param expectedValue The expected value
+   * @throws IOException if the JSON cannot be parsed
+   * @throws AssertionError if the value doesn't match
+   */
+  protected void assertJsonPath(
+      ResponseEntity<String> response, String jsonPath, Object expectedValue) throws IOException {
+    Map<String, Object> json = parseJsonResponse(response);
+    Object actualValue = getJsonPathValue(json, jsonPath);
+    org.junit.jupiter.api.Assertions.assertEquals(
+        expectedValue, actualValue, "JSON path '" + jsonPath + "' mismatch");
+  }
+
+  private Object getJsonPathValue(Map<String, Object> json, String jsonPath) {
+    String[] parts = jsonPath.split("\\.");
+    Object current = json;
+    for (String part : parts) {
+      if (current instanceof Map) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = (Map<String, Object>) current;
+        current = map.get(part);
+      } else {
+        return null;
+      }
+    }
+    return current;
   }
 
   protected MultiValueMap<String, String> getDefaultHeaders() {

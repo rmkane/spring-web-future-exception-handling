@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -98,6 +99,27 @@ public final class RestRequestBuilder {
 
   public RestRequestBuilder body(String body) {
     this.body = body == null ? null : body.getBytes(StandardCharsets.UTF_8);
+    return this;
+  }
+
+  /* --------------------- Authentication helpers --------------------- */
+
+  /** Adds a Bearer token to the Authorization header. */
+  public RestRequestBuilder bearerToken(String token) {
+    if (token != null) {
+      this.headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+    }
+    return this;
+  }
+
+  /** Adds Basic authentication to the Authorization header. */
+  public RestRequestBuilder basicAuth(String username, String password) {
+    if (username != null && password != null) {
+      String credentials = username + ":" + password;
+      String encoded =
+          Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+      this.headers.add(HttpHeaders.AUTHORIZATION, "Basic " + encoded);
+    }
     return this;
   }
 
