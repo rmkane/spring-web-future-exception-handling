@@ -2,6 +2,7 @@ package com.example.integration.request;
 
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpHeaders;
@@ -13,22 +14,34 @@ import org.springframework.util.MultiValueMap;
 
 /** Immutable HTTP request for integration tests. */
 public final class RestRequest implements HttpRequest {
-  private final URI uri;
-  private final HttpMethod method;
-  private final HttpHeaders headers;
+  @NonNull private final URI uri;
+  @NonNull private final HttpMethod method;
+  @NonNull private final HttpHeaders headers;
   @Nullable private final byte[] body;
   @Nullable private final MultiValueMap<String, Object> multipartBody;
+  @NonNull private final Map<String, Object> attributes;
+
+  RestRequest(
+      @NonNull URI uri,
+      @NonNull HttpMethod method,
+      @NonNull HttpHeaders headers,
+      @Nullable byte[] body,
+      @Nullable MultiValueMap<String, Object> multipartBody,
+      @NonNull Map<String, Object> attributes) {
+    this.uri = uri;
+    this.method = method;
+    this.headers = HttpHeaders.readOnlyHttpHeaders(headers);
+    this.body = body;
+    this.multipartBody = multipartBody;
+    this.attributes = new HashMap<>(attributes);
+  }
 
   RestRequest(
       @NonNull URI uri,
       @NonNull HttpMethod method,
       @NonNull HttpHeaders headers,
       @Nullable byte[] body) {
-    this.uri = uri;
-    this.method = method;
-    this.headers = HttpHeaders.readOnlyHttpHeaders(headers);
-    this.body = body;
-    this.multipartBody = null;
+    this(uri, method, headers, body, null, new HashMap<>());
   }
 
   RestRequest(
@@ -36,11 +49,7 @@ public final class RestRequest implements HttpRequest {
       @NonNull HttpMethod method,
       @NonNull HttpHeaders headers,
       @Nullable MultiValueMap<String, Object> multipartBody) {
-    this.uri = uri;
-    this.method = method;
-    this.headers = HttpHeaders.readOnlyHttpHeaders(headers);
-    this.body = null;
-    this.multipartBody = multipartBody;
+    this(uri, method, headers, null, multipartBody, new HashMap<>());
   }
 
   @NonNull
@@ -68,7 +77,7 @@ public final class RestRequest implements HttpRequest {
   @NonNull
   @Override
   public Map<String, Object> getAttributes() {
-    return Map.of();
+    return attributes;
   }
 
   /** Raw body bytes, or {@code null} if no body. */
@@ -77,8 +86,8 @@ public final class RestRequest implements HttpRequest {
     return body;
   }
 
-  public Optional<String> getBodyAsString(Charset charset) {
-    return body == null ? Optional.empty() : Optional.of(new String(body, charset));
+  public Optional<String> getBodyAsString(@NonNull Charset charset) {
+    return Optional.ofNullable(body).map(b -> new String(b, charset));
   }
 
   /** Multipart form data body, or {@code null} if not a multipart request. */

@@ -4,13 +4,14 @@ import java.util.Collection;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /** Simple builder for HTTP headers backed by a {@link MultiValueMap}. */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HeadersBuilder {
-  private final LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+  @NonNull private final LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 
   public static HeadersBuilder create() {
     return new HeadersBuilder();
@@ -42,6 +43,7 @@ public final class HeadersBuilder {
   }
 
   /** Return a copy of the built headers map. */
+  @NonNull
   public MultiValueMap<String, String> build() {
     return new LinkedMultiValueMap<>(headers);
   }

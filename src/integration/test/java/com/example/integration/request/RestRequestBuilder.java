@@ -16,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -24,12 +25,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 /** Builder for {@link RestRequest} instances. */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RestRequestBuilder {
-  private String baseUrl;
-  private String endpoint;
-  private HttpMethod method = HttpMethod.GET;
-  private final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-  private final Map<String, String> queryParams = new LinkedHashMap<>();
-  private final Map<String, Object> pathVariables = new LinkedHashMap<>();
+  @NonNull private String baseUrl;
+  @Nullable private String endpoint;
+  @NonNull private HttpMethod method = Objects.requireNonNull(HttpMethod.GET);
+  @NonNull private final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+  @NonNull private final Map<String, String> queryParams = new LinkedHashMap<>();
+  @NonNull private final Map<String, Object> pathVariables = new LinkedHashMap<>();
   @Nullable private byte[] body;
 
   // Multipart state: presence => multipart
@@ -188,9 +189,11 @@ public final class RestRequestBuilder {
   /* --------------------- Build --------------------- */
 
   public RestRequest build() {
-    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUrl);
-    if (endpoint != null && !endpoint.isEmpty()) {
-      uriBuilder.path(endpoint);
+    String baseUrlValue = Objects.requireNonNull(baseUrl, "baseUrl must be set via create()");
+    UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUrlValue);
+    String endpointValue = endpoint;
+    if (endpointValue != null && !endpointValue.isEmpty()) {
+      uriBuilder.path(endpointValue);
     }
     queryParams.forEach(uriBuilder::queryParam);
 
