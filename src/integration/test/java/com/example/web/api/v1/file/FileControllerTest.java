@@ -2,10 +2,10 @@ package com.example.web.api.v1.file;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.example.integration.RestFetcher;
-import com.example.integration.RestRequest;
-import com.example.integration.RestRequestBuilder;
-import com.example.web.api.BaseControllerTest;
+import com.example.integration.BaseControllerTest;
+import com.example.integration.request.RestFetcher;
+import com.example.integration.request.RestRequest;
+import com.example.integration.request.RestRequestBuilder;
 import java.io.IOException;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -17,13 +17,15 @@ import org.springframework.http.ResponseEntity;
 final class FileControllerTest extends BaseControllerTest {
   @Test
   void testUploadFile() throws IOException {
+
+    String fileName = "test.txt";
     RestFetcher fetcher = new RestFetcher();
     RestRequest request =
         RestRequestBuilder.create(BASE_URL, "/api/v1/files")
             .method(HttpMethod.POST)
-            .file("test.txt", loadResource("/files/test.txt"))
+            .file("file", loadResource("/files/" + fileName), fileName)
             .build();
-    ResponseEntity<String> response = fetcher.exchange(request, String.class);
+    ResponseEntity<String> response = fetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("File uploaded successfully", response.getBody());
@@ -36,9 +38,9 @@ final class FileControllerTest extends BaseControllerTest {
     RestRequest request =
         RestRequestBuilder.create(BASE_URL, "/api/v1/files")
             .method(HttpMethod.POST)
-            .file(fileName, loadResource("/files/" + fileName))
+            .file("file", loadResource("/files/" + fileName), fileName)
             .build();
-    ResponseEntity<String> response = fetcher.exchange(request, String.class);
+    ResponseEntity<String> response = fetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals("MP3 file uploaded successfully", response.getBody());

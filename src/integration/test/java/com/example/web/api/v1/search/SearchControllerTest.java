@@ -2,10 +2,10 @@ package com.example.web.api.v1.search;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.example.integration.RestFetcher;
-import com.example.integration.RestRequest;
-import com.example.integration.RestRequestBuilder;
-import com.example.web.api.BaseControllerTest;
+import com.example.integration.BaseControllerTest;
+import com.example.integration.request.RestFetcher;
+import com.example.integration.request.RestRequest;
+import com.example.integration.request.RestRequestBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
@@ -28,7 +28,7 @@ final class SearchControllerTest extends BaseControllerTest {
             .headers(getDefaultHeaders())
             .body(body)
             .build();
-    ResponseEntity<String> response = fetcher.exchange(request, String.class);
+    ResponseEntity<String> response = fetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     writeJsonResponse(response.getBody(), "search_returnsResults_forFoo.json");
@@ -48,7 +48,7 @@ final class SearchControllerTest extends BaseControllerTest {
             .headers(getDefaultHeaders())
             .body(body)
             .build();
-    ResponseEntity<String> response = fetcher.exchange(request, String.class);
+    ResponseEntity<String> response = fetcher.fetch(request, String.class);
 
     assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
   }

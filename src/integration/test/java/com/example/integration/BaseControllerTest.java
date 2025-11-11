@@ -1,6 +1,6 @@
-package com.example.web.api;
+package com.example.integration;
 
-import com.example.integration.HeadersBuilder;
+import com.example.integration.request.HeadersBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

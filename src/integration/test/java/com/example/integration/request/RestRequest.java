@@ -1,4 +1,4 @@
-package com.example.integration;
+package com.example.integration.request;
 
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -31,12 +31,11 @@ public final class RestRequest implements HttpRequest {
       URI uri,
       HttpMethod method,
       HttpHeaders headers,
-      @Nullable byte[] body,
       @Nullable MultiValueMap<String, Object> multipartBody) {
     this.uri = uri;
     this.method = method;
     this.headers = HttpHeaders.readOnlyHttpHeaders(headers);
-    this.body = body;
+    this.body = null;
     this.multipartBody = multipartBody;
   }
 
@@ -86,6 +85,6 @@ public final class RestRequest implements HttpRequest {
 
   /** Returns {@code true} if this is a multipart form data request. */
   public boolean isMultipart() {
-    return multipartBody != null;
+    return multipartBody != null && !multipartBody.isEmpty();
   }
 }

@@ -1,17 +1,16 @@
-package com.example.integration;
+package com.example.integration.request;
 
 import java.util.Collection;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /** Simple builder for HTTP headers backed by a {@link MultiValueMap}. */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HeadersBuilder {
-  private final LinkedMultiValueMap<String, String> headers;
-
-  private HeadersBuilder() {
-    this.headers = new LinkedMultiValueMap<>();
-  }
+  private final LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 
   public static HeadersBuilder create() {
     return new HeadersBuilder();
