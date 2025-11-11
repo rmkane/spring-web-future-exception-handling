@@ -17,6 +17,7 @@ final class ApiControllerTest {
   @Autowired private MockMvc mockMvc;
 
   @Test
+  @SuppressWarnings("null")
   void getApiRootReturnsVersionsAndLinks() throws Exception {
     mockMvc
         .perform(get("/api"))
