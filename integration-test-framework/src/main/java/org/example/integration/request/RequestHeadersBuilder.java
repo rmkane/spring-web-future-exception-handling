@@ -26,16 +26,16 @@ public final class RequestHeadersBuilder {
     return this;
   }
 
+  public RequestHeadersBuilder addHeaderContentType(String mediaType) {
+    return addHeader(HttpHeaders.CONTENT_TYPE, mediaType);
+  }
+
   public RequestHeadersBuilder addHeaderContentType(MediaType mediaType) {
-    return addHeader(HttpHeaders.CONTENT_TYPE, mediaType.toString());
+    return addHeaderContentType(mediaType.toString());
   }
 
   public RequestHeadersBuilder addHeaderContentType(ContentType contentType) {
-    return addHeader(HttpHeaders.CONTENT_TYPE, contentType.toString());
-  }
-
-  public RequestHeadersBuilder addHeaderContentType(String mediaType) {
-    return addHeader(HttpHeaders.CONTENT_TYPE, mediaType);
+    return addHeaderContentType(contentType.toString());
   }
 
   public RequestHeadersBuilder addHeaderContentTypeXml() {
