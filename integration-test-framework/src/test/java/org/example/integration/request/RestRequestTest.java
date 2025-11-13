@@ -58,8 +58,7 @@ class RestRequestTest {
     attributes.put("key1", "value1");
     attributes.put("key2", 123);
 
-    RestRequest request =
-        new RestRequest(uri, HttpMethod.GET, headers, null, null, attributes);
+    RestRequest request = new RestRequest(uri, HttpMethod.GET, headers, null, null, attributes);
 
     assertEquals("value1", request.getAttributes().get("key1"));
     assertEquals(123, request.getAttributes().get("key2"));
@@ -104,10 +103,7 @@ class RestRequestTest {
 
     RestRequest request =
         new RestRequest(
-            URI.create("http://localhost:8080"),
-            HttpMethod.GET,
-            originalHeaders,
-            (byte[]) null);
+            URI.create("http://localhost:8080"), HttpMethod.GET, originalHeaders, (byte[]) null);
 
     HttpHeaders headers = request.getHeaders();
     // Headers should be read-only (wrapped by HttpHeaders.readOnlyHttpHeaders)
@@ -130,4 +126,3 @@ class RestRequestTest {
     assertEquals("newValue", request.getAttributes().get("newKey"));
   }
 }
-

@@ -1,6 +1,5 @@
 package org.example.integration.request;
 
-import org.example.integration.util.MapUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -11,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.example.integration.util.MapUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ContentDisposition;
@@ -33,6 +33,7 @@ public final class RestRequestBuilder {
   @NonNull private final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
   @NonNull private final Map<String, String> queryParams = new LinkedHashMap<>();
   @NonNull private final Map<String, Object> pathVariables = new LinkedHashMap<>();
+  @NonNull private final Map<String, Object> attributes = new LinkedHashMap<>();
   @Nullable private byte[] body;
 
   // Multipart state: presence => multipart
@@ -89,6 +90,20 @@ public final class RestRequestBuilder {
 
   public RestRequestBuilder queryParams(Map<String, String> params) {
     MapUtils.putAllIf(this.queryParams, params);
+    return this;
+  }
+
+  /** Add a single attribute to the request. */
+  public RestRequestBuilder attribute(String name, Object value) {
+    MapUtils.putIf(this.attributes, name, value);
+    return this;
+  }
+
+  /** Add multiple attributes to the request. */
+  public RestRequestBuilder attributes(Map<String, ?> attrs) {
+    @SuppressWarnings("unchecked")
+    Map<String, Object> castAttrs = (Map<String, Object>) attrs;
+    MapUtils.putAllIf(this.attributes, castAttrs);
     return this;
   }
 
@@ -166,7 +181,7 @@ public final class RestRequestBuilder {
     // Per-part headers
     HttpHeaders partHeaders = new HttpHeaders();
     partHeaders.setContentDisposition(
-        ContentDisposition.formData().name(field).filename(resource.getFilename()).build());
+        createFormDataContentDisposition(field, resource.getFilename()));
     if (contentType != null) {
       partHeaders.setContentType(contentType);
     }
@@ -189,13 +204,18 @@ public final class RestRequestBuilder {
 
     HttpHeaders partHeaders = new HttpHeaders();
     partHeaders.setContentDisposition(
-        ContentDisposition.formData().name(field).filename(resource.getFilename()).build());
+        createFormDataContentDisposition(field, resource.getFilename()));
     if (contentType != null) {
       partHeaders.setContentType(contentType);
     }
 
     ensureMultipart().add(field, new HttpEntity<>(resource, partHeaders));
     return this;
+  }
+
+  @NonNull
+  private ContentDisposition createFormDataContentDisposition(String field, String filename) {
+    return ContentDisposition.formData().name(field).filename(filename).build();
   }
 
   /* --------------------- Build --------------------- */
@@ -219,9 +239,9 @@ public final class RestRequestBuilder {
 
     if (multipartParts != null && !multipartParts.isEmpty()) {
       httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-      return new RestRequest(uri, method, httpHeaders, multipartParts);
+      return new RestRequest(uri, method, httpHeaders, null, multipartParts, attributes);
     }
 
-    return new RestRequest(uri, method, httpHeaders, body);
+    return new RestRequest(uri, method, httpHeaders, body, null, attributes);
   }
 }

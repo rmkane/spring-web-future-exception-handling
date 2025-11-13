@@ -70,8 +70,7 @@ class JsonFormatterTest {
     String invalidJson = "{invalid json}";
 
     assertThrows(
-        JsonProcessingException.class,
-        () -> JsonFormatter.format(objectMapper, invalidJson));
+        JsonProcessingException.class, () -> JsonFormatter.format(objectMapper, invalidJson));
   }
 
   @Test
@@ -101,4 +100,3 @@ class JsonFormatterTest {
     assertTrue(formatted.contains("Hello"));
   }
 }
-

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.util.Map;
 import org.example.integration.request.RestRequestBuilder;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -18,15 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
 /** Test class to verify BaseControllerTest helper methods work correctly. */
-class BaseControllerTestTest extends BaseControllerTest {
-
-  @BeforeAll
-  static void verifySetup() {
-    // Verify that @BeforeAll from parent class ran
-    assertNotNull(objectMapper);
-    assertNotNull(restFetcher);
-  }
-
+class IntegrationTestSuiteTest extends IntegrationTestSuite {
   @Test
   void testGetBaseUrl() {
     String baseUrl = getBaseUrl();
@@ -135,32 +126,5 @@ class BaseControllerTestTest extends BaseControllerTest {
   }
 
   // Helper class for testing
-  static class TestObject {
-    private String name;
-    private int value;
-
-    public TestObject() {}
-
-    public TestObject(String name, int value) {
-      this.name = name;
-      this.value = value;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public int getValue() {
-      return value;
-    }
-
-    public void setValue(int value) {
-      this.value = value;
-    }
-  }
+  record TestObject(String name, int value) {}
 }
-

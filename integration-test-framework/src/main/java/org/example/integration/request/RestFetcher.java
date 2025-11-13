@@ -48,7 +48,6 @@ public final class RestFetcher {
       ResponseEntity<T> result =
           restTemplate.exchange(request.getURI(), request.getMethod(), entity, clazz);
       return result;
-
     } catch (HttpClientErrorException | HttpServerErrorException e) {
       return createErrorResponse(e);
     }

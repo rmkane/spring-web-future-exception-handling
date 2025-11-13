@@ -50,9 +50,7 @@ class RestRequestBuilderTest {
   @Test
   void testEndpoint() {
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .endpoint("/api/users")
-            .build();
+        RestRequestBuilder.create("http://localhost:8080").endpoint("/api/users").build();
 
     assertTrue(request.getURI().toString().endsWith("/api/users"));
   }
@@ -64,9 +62,7 @@ class RestRequestBuilderTest {
     headers.add("X-Another-Header", "value2");
 
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .headers(headers)
-            .build();
+        RestRequestBuilder.create("http://localhost:8080").headers(headers).build();
 
     assertEquals("value1", request.getHeaders().getFirst("X-Custom-Header"));
     assertEquals("value2", request.getHeaders().getFirst("X-Another-Header"));
@@ -144,10 +140,7 @@ class RestRequestBuilderTest {
   void testBodyWithBytes() {
     byte[] body = "test body".getBytes(StandardCharsets.UTF_8);
 
-    RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .body(body)
-            .build();
+    RestRequest request = RestRequestBuilder.create("http://localhost:8080").body(body).build();
 
     assertEquals(body, request.getBody());
   }
@@ -156,10 +149,7 @@ class RestRequestBuilderTest {
   void testBodyWithString() {
     String body = "test body";
 
-    RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .body(body)
-            .build();
+    RestRequest request = RestRequestBuilder.create("http://localhost:8080").body(body).build();
 
     assertEquals(body, new String(request.getBody(), StandardCharsets.UTF_8));
   }
@@ -167,9 +157,7 @@ class RestRequestBuilderTest {
   @Test
   void testBearerToken() {
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .bearerToken("token123")
-            .build();
+        RestRequestBuilder.create("http://localhost:8080").bearerToken("token123").build();
 
     assertEquals("Bearer token123", request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
   }
@@ -177,9 +165,7 @@ class RestRequestBuilderTest {
   @Test
   void testBearerTokenNull() {
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .bearerToken(null)
-            .build();
+        RestRequestBuilder.create("http://localhost:8080").bearerToken(null).build();
 
     assertNull(request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
   }
@@ -187,9 +173,7 @@ class RestRequestBuilderTest {
   @Test
   void testBasicAuth() {
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .basicAuth("user", "pass")
-            .build();
+        RestRequestBuilder.create("http://localhost:8080").basicAuth("user", "pass").build();
 
     String auth = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
     assertNotNull(auth);
@@ -199,9 +183,7 @@ class RestRequestBuilderTest {
   @Test
   void testBasicAuthNull() {
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .basicAuth(null, null)
-            .build();
+        RestRequestBuilder.create("http://localhost:8080").basicAuth(null, null).build();
 
     assertNull(request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
   }
@@ -250,9 +232,7 @@ class RestRequestBuilderTest {
     Files.write(testFile.toPath(), "file content".getBytes(StandardCharsets.UTF_8));
 
     RestRequest request =
-        RestRequestBuilder.create("http://localhost:8080")
-            .file("file", testFile)
-            .build();
+        RestRequestBuilder.create("http://localhost:8080").file("file", testFile).build();
 
     assertTrue(request.isMultipart());
     assertNotNull(request.getMultipartBody());
@@ -308,4 +288,3 @@ class RestRequestBuilderTest {
     assertNotNull(request.getBody());
   }
 }
-

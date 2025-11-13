@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +132,7 @@ class MapUtilsTest {
   @Test
   void testAddAllIfWithValidCollection() {
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    List<String> values = Arrays.asList("value1", "value2", "value3");
+    List<String> values = List.of("value1", "value2", "value3");
 
     MapUtils.addAllIf(map, "key", values);
 
@@ -144,7 +143,7 @@ class MapUtilsTest {
   @Test
   void testAddAllIfWithNullKey() {
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    List<String> values = Arrays.asList("value1", "value2");
+    List<String> values = List.of("value1", "value2");
 
     MapUtils.addAllIf(map, null, values);
 
@@ -182,7 +181,7 @@ class MapUtilsTest {
   @Test
   void testPutIfMultiValueMapWithValidKeyAndValues() {
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    List<String> values = Arrays.asList("value1", "value2");
+    List<String> values = List.of("value1", "value2");
 
     MapUtils.putIf(map, "key", values);
 
@@ -192,7 +191,7 @@ class MapUtilsTest {
   @Test
   void testPutIfMultiValueMapWithNullKey() {
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    List<String> values = Arrays.asList("value1", "value2");
+    List<String> values = List.of("value1", "value2");
 
     MapUtils.putIf(map, null, values);
 
@@ -215,7 +214,7 @@ class MapUtilsTest {
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     map.add("key", "oldValue");
 
-    List<String> newValues = Arrays.asList("newValue1", "newValue2");
+    List<String> newValues = List.of("newValue1", "newValue2");
     MapUtils.putIf(map, "key", newValues);
 
     assertEquals(newValues, map.get("key"));
@@ -225,7 +224,7 @@ class MapUtilsTest {
   @Test
   void testPutIfMultiValueMapWithImmutableList() {
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    List<String> values = Arrays.asList("value1", "value2");
+    List<String> values = List.of("value1", "value2");
 
     MapUtils.putIf(map, "key", values);
 
@@ -234,4 +233,3 @@ class MapUtilsTest {
     assertEquals(values, result);
   }
 }
-

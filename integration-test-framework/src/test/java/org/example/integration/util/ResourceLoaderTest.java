@@ -59,4 +59,3 @@ class ResourceLoaderTest {
     assertTrue(content.contains("{") || content.contains("["));
   }
 }
-

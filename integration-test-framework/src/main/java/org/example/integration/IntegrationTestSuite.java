@@ -2,27 +2,38 @@ package org.example.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.example.integration.request.HeadersBuilder;
-import org.example.integration.request.RestFetcher;
-import org.example.integration.request.RestRequestBuilder;
-import org.example.integration.util.ResourceLoader;
-import org.example.integration.util.ResponseWriter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Map;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import org.example.integration.request.RequestHeadersBuilder;
+import org.example.integration.request.RestFetcher;
+import org.example.integration.request.RestRequest;
+import org.example.integration.request.RestRequestBuilder;
+import org.example.integration.util.JsonFormatter;
+import org.example.integration.util.ResourceLoader;
+import org.example.integration.util.ResponseWriter;
 import org.junit.jupiter.api.BeforeAll;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public abstract class BaseControllerTest {
+public abstract class IntegrationTestSuite {
   private static final int DEFAULT_PORT = 8080;
   private static final String PROTOCOL_HTTP = "http";
   private static final String PORT_PROPERTY = "test.server.port";
@@ -30,14 +41,14 @@ public abstract class BaseControllerTest {
 
   private static final int PORT = resolvePort();
 
-  protected static ObjectMapper objectMapper;
+  protected ObjectMapper objectMapper;
+  protected XmlMapper xmlMapper;
+  protected Transformer transformer;
+
   protected static RestFetcher restFetcher;
 
   @BeforeAll
   static void setUp() {
-    objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule());
-    // Reuse a single RestTemplate instance across all tests (thread-safe)
     restFetcher = new RestFetcher(new RestTemplate());
   }
 
@@ -86,6 +97,15 @@ public abstract class BaseControllerTest {
     return request(endpoint).method(HttpMethod.DELETE);
   }
 
+  protected <T> ResponseEntity<T> fetch(RestRequest request, Class<T> responseType) {
+    return restFetcher.fetch(request, responseType);
+  }
+
+  protected <T> ResponseEntity<T> fetch(
+      RestRequest request, ParameterizedTypeReference<T> responseType) {
+    return restFetcher.fetch(request, responseType);
+  }
+
   /**
    * Parses a JSON response body into a Map. Useful for testing JSON responses.
    *
@@ -95,7 +115,8 @@ public abstract class BaseControllerTest {
    */
   protected Map<String, Object> parseJsonResponse(ResponseEntity<String> response)
       throws IOException {
-    return objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+    return getObjectMapperInstance()
+        .readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
   }
 
   /**
@@ -106,7 +127,44 @@ public abstract class BaseControllerTest {
    * @throws JsonProcessingException if the object cannot be serialized
    */
   protected String toJson(Object object) throws JsonProcessingException {
-    return objectMapper.writeValueAsString(object);
+    return getObjectMapperInstance().writeValueAsString(object);
+  }
+
+  /**
+   * Formats an object as JSON with pretty printing. Uses ObjectMapper to serialize the object
+   * first.
+   *
+   * @param value The object to serialize and format as JSON
+   * @return Formatted JSON string with indentation
+   * @throws JsonProcessingException if the object cannot be serialized
+   */
+  protected String formatJson(Object value) throws JsonProcessingException {
+    // Serialize object to JSON string using ObjectMapper
+    String jsonString = getObjectMapperInstance().writeValueAsString(value);
+    // Format the JSON string with pretty printing
+    return formatJsonString(jsonString);
+  }
+
+  /**
+   * Formats a JSON string with pretty printing (indentation).
+   *
+   * @param json The JSON string to format
+   * @return Formatted JSON string with indentation
+   * @throws JsonProcessingException if the JSON is invalid
+   */
+  protected String formatJson(String json) throws JsonProcessingException {
+    return formatJsonString(json);
+  }
+
+  /**
+   * Internal helper method that performs the actual JSON formatting with pretty printing.
+   *
+   * @param jsonString The JSON string to format
+   * @return Formatted JSON string with indentation
+   * @throws JsonProcessingException if the JSON is invalid
+   */
+  private String formatJsonString(String jsonString) throws JsonProcessingException {
+    return JsonFormatter.format(getObjectMapperInstance(), jsonString);
   }
 
   /**
@@ -143,8 +201,7 @@ public abstract class BaseControllerTest {
       ResponseEntity<String> response, String jsonPath, Object expectedValue) throws IOException {
     Map<String, Object> json = parseJsonResponse(response);
     Object actualValue = getJsonPathValue(json, jsonPath);
-    org.junit.jupiter.api.Assertions.assertEquals(
-        expectedValue, actualValue, "JSON path '" + jsonPath + "' mismatch");
+    assertEquals(expectedValue, actualValue, "JSON path '" + jsonPath + "' mismatch");
   }
 
   private Object getJsonPathValue(Map<String, Object> json, String jsonPath) {
@@ -162,8 +219,8 @@ public abstract class BaseControllerTest {
     return current;
   }
 
-  protected MultiValueMap<String, String> getDefaultHeaders() {
-    return HeadersBuilder.create()
+  protected HttpHeaders getDefaultHeaders() {
+    return RequestHeadersBuilder.create()
         .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .build();
   }
@@ -177,15 +234,94 @@ public abstract class BaseControllerTest {
   }
 
   protected void writeJsonResponse(String response, String fileName) throws IOException {
-    ResponseWriter.writeJson(objectMapper, response, fileName);
+    ResponseWriter.writeJson(getObjectMapperInstance(), response, fileName);
   }
 
   protected void writeJsonResponse(Object response, String fileName) throws IOException {
-    ResponseWriter.writeJson(objectMapper, response, fileName);
+    ResponseWriter.writeJson(getObjectMapperInstance(), response, fileName);
   }
 
   protected void writeResponse(String response, String fileName) throws IOException {
     ResponseWriter.write(response, fileName);
+  }
+
+  protected ObjectMapper getObjectMapperInstance() {
+    if (objectMapper == null) {
+      objectMapper = new ObjectMapper();
+      objectMapper.registerModule(new JavaTimeModule());
+    }
+    return objectMapper;
+  }
+
+  protected XmlMapper getXmlMapperInstance() {
+    if (xmlMapper == null) {
+      xmlMapper = new XmlMapper();
+      xmlMapper.registerModule(new JavaTimeModule());
+    }
+    return xmlMapper;
+  }
+
+  protected Transformer getTransformerInstance() {
+    if (transformer == null) {
+      try {
+        TransformerFactory factory = TransformerFactory.newInstance();
+        transformer = factory.newTransformer();
+        // Configure for pretty printing
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        // Set indent amount (works with Xalan and Saxon)
+        try {
+          transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        } catch (IllegalArgumentException e) {
+          // Ignore if not supported (some transformers don't support this property)
+        }
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to create XML transformer", e);
+      }
+    }
+    return transformer;
+  }
+
+  /**
+   * Formats an object as XML with pretty printing. Uses XmlMapper to serialize the object first.
+   *
+   * @param value The object to serialize and format as XML
+   * @return Formatted XML string with indentation
+   * @throws JsonProcessingException if the object cannot be serialized
+   * @throws TransformerException if the XML cannot be formatted
+   */
+  protected String formatXml(Object value) throws JsonProcessingException, TransformerException {
+    // Serialize object to XML string using XmlMapper
+    String xmlString = getXmlMapperInstance().writeValueAsString(value);
+    // Format the XML string with pretty printing
+    return formatXmlString(xmlString);
+  }
+
+  /**
+   * Formats an XML string with pretty printing (indentation).
+   *
+   * @param xml The XML string to format
+   * @return Formatted XML string with indentation
+   * @throws TransformerException if the XML cannot be transformed
+   */
+  protected String formatXml(String xml) throws TransformerException {
+    return formatXmlString(xml);
+  }
+
+  /**
+   * Internal helper method that performs the actual XML formatting with pretty printing.
+   *
+   * @param xmlString The XML string to format
+   * @return Formatted XML string with indentation
+   * @throws TransformerException if the XML cannot be transformed
+   */
+  private String formatXmlString(String xmlString) throws TransformerException {
+    StringWriter writer = new StringWriter();
+    getTransformerInstance()
+        .transform(new StreamSource(new StringReader(xmlString)), new StreamResult(writer));
+    return writer.toString();
   }
 
   private static int resolvePort() {

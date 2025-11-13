@@ -37,14 +37,10 @@ class RestFetcherTest {
             .method(HttpMethod.GET)
             .build();
 
-    ResponseEntity<String> expectedResponse =
-        new ResponseEntity<>("response body", HttpStatus.OK);
+    ResponseEntity<String> expectedResponse = new ResponseEntity<>("response body", HttpStatus.OK);
 
     when(restTemplate.exchange(
-            eq(request.getURI()),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(String.class)))
+            eq(request.getURI()), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
         .thenReturn(expectedResponse);
 
     ResponseEntity<String> response = restFetcher.fetch(request, String.class);
@@ -54,10 +50,7 @@ class RestFetcherTest {
     assertEquals("response body", response.getBody());
     verify(restTemplate)
         .exchange(
-            eq(request.getURI()),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(String.class));
+            eq(request.getURI()), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class));
   }
 
   @Test
@@ -99,14 +92,10 @@ class RestFetcherTest {
             .body("{\"name\":\"test\"}")
             .build();
 
-    ResponseEntity<String> expectedResponse =
-        new ResponseEntity<>("created", HttpStatus.CREATED);
+    ResponseEntity<String> expectedResponse = new ResponseEntity<>("created", HttpStatus.CREATED);
 
     when(restTemplate.exchange(
-            eq(request.getURI()),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            eq(String.class)))
+            eq(request.getURI()), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
         .thenReturn(expectedResponse);
 
     ResponseEntity<String> response = restFetcher.fetch(request, String.class);
@@ -128,10 +117,7 @@ class RestFetcherTest {
             HttpStatus.NOT_FOUND, "Not Found", "User not found".getBytes(), null);
 
     when(restTemplate.exchange(
-            eq(request.getURI()),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(String.class)))
+            eq(request.getURI()), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
         .thenThrow(exception);
 
     ResponseEntity<String> response = restFetcher.fetch(request, String.class);
@@ -156,10 +142,7 @@ class RestFetcherTest {
             null);
 
     when(restTemplate.exchange(
-            eq(request.getURI()),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(String.class)))
+            eq(request.getURI()), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
         .thenThrow(exception);
 
     ResponseEntity<String> response = restFetcher.fetch(request, String.class);
@@ -177,14 +160,10 @@ class RestFetcherTest {
             .part("field", "value")
             .build();
 
-    ResponseEntity<String> expectedResponse =
-        new ResponseEntity<>("uploaded", HttpStatus.OK);
+    ResponseEntity<String> expectedResponse = new ResponseEntity<>("uploaded", HttpStatus.OK);
 
     when(restTemplate.exchange(
-            eq(request.getURI()),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            eq(String.class)))
+            eq(request.getURI()), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
         .thenReturn(expectedResponse);
 
     ResponseEntity<String> response = restFetcher.fetch(request, String.class);
@@ -199,4 +178,3 @@ class RestFetcherTest {
     assertNotNull(fetcher);
   }
 }
-
