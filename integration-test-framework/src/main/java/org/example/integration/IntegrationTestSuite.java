@@ -31,6 +31,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.client.RestTemplate;
 
 public abstract class IntegrationTestSuite {
@@ -41,15 +42,38 @@ public abstract class IntegrationTestSuite {
 
   private static final int PORT = resolvePort();
 
-  protected ObjectMapper objectMapper;
-  protected XmlMapper xmlMapper;
-  protected Transformer transformer;
-
   protected static RestFetcher restFetcher;
+  protected static ObjectMapper objectMapper;
+  protected static XmlMapper xmlMapper;
+  protected static Transformer transformer;
 
   @BeforeAll
   static void setUp() {
     restFetcher = new RestFetcher(new RestTemplate());
+
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+
+    xmlMapper = new XmlMapper();
+    xmlMapper.registerModule(new JavaTimeModule());
+
+    try {
+      TransformerFactory factory = TransformerFactory.newInstance();
+      transformer = factory.newTransformer();
+      // Configure for pretty printing
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+      // Set indent amount (works with Xalan and Saxon)
+      try {
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+      } catch (IllegalArgumentException e) {
+        // Ignore if not supported (some transformers don't support this property)
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to create XML transformer", e);
+    }
   }
 
   /** Returns the base URL for the test server. Can be overridden by subclasses. */
@@ -97,12 +121,12 @@ public abstract class IntegrationTestSuite {
     return request(endpoint).method(HttpMethod.DELETE);
   }
 
-  protected <T> ResponseEntity<T> fetch(RestRequest request, Class<T> responseType) {
+  protected <T> ResponseEntity<T> fetch(RestRequest request, @NonNull Class<T> responseType) {
     return restFetcher.fetch(request, responseType);
   }
 
   protected <T> ResponseEntity<T> fetch(
-      RestRequest request, ParameterizedTypeReference<T> responseType) {
+      RestRequest request, @NonNull ParameterizedTypeReference<T> responseType) {
     return restFetcher.fetch(request, responseType);
   }
 
@@ -115,8 +139,7 @@ public abstract class IntegrationTestSuite {
    */
   protected Map<String, Object> parseJsonResponse(ResponseEntity<String> response)
       throws IOException {
-    return getObjectMapperInstance()
-        .readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+    return objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
   }
 
   /**
@@ -127,7 +150,7 @@ public abstract class IntegrationTestSuite {
    * @throws JsonProcessingException if the object cannot be serialized
    */
   protected String toJson(Object object) throws JsonProcessingException {
-    return getObjectMapperInstance().writeValueAsString(object);
+    return objectMapper.writeValueAsString(object);
   }
 
   /**
@@ -140,7 +163,7 @@ public abstract class IntegrationTestSuite {
    */
   protected String formatJson(Object value) throws JsonProcessingException {
     // Serialize object to JSON string using ObjectMapper
-    String jsonString = getObjectMapperInstance().writeValueAsString(value);
+    String jsonString = objectMapper.writeValueAsString(value);
     // Format the JSON string with pretty printing
     return formatJsonString(jsonString);
   }
@@ -164,7 +187,7 @@ public abstract class IntegrationTestSuite {
    * @throws JsonProcessingException if the JSON is invalid
    */
   private String formatJsonString(String jsonString) throws JsonProcessingException {
-    return JsonFormatter.format(getObjectMapperInstance(), jsonString);
+    return JsonFormatter.format(objectMapper, jsonString);
   }
 
   /**
@@ -234,54 +257,15 @@ public abstract class IntegrationTestSuite {
   }
 
   protected void writeJsonResponse(String response, String fileName) throws IOException {
-    ResponseWriter.writeJson(getObjectMapperInstance(), response, fileName);
+    ResponseWriter.writeJson(objectMapper, response, fileName);
   }
 
   protected void writeJsonResponse(Object response, String fileName) throws IOException {
-    ResponseWriter.writeJson(getObjectMapperInstance(), response, fileName);
+    ResponseWriter.writeJson(objectMapper, response, fileName);
   }
 
   protected void writeResponse(String response, String fileName) throws IOException {
     ResponseWriter.write(response, fileName);
-  }
-
-  protected ObjectMapper getObjectMapperInstance() {
-    if (objectMapper == null) {
-      objectMapper = new ObjectMapper();
-      objectMapper.registerModule(new JavaTimeModule());
-    }
-    return objectMapper;
-  }
-
-  protected XmlMapper getXmlMapperInstance() {
-    if (xmlMapper == null) {
-      xmlMapper = new XmlMapper();
-      xmlMapper.registerModule(new JavaTimeModule());
-    }
-    return xmlMapper;
-  }
-
-  protected Transformer getTransformerInstance() {
-    if (transformer == null) {
-      try {
-        TransformerFactory factory = TransformerFactory.newInstance();
-        transformer = factory.newTransformer();
-        // Configure for pretty printing
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        // Set indent amount (works with Xalan and Saxon)
-        try {
-          transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        } catch (IllegalArgumentException e) {
-          // Ignore if not supported (some transformers don't support this property)
-        }
-      } catch (Exception e) {
-        throw new RuntimeException("Failed to create XML transformer", e);
-      }
-    }
-    return transformer;
   }
 
   /**
@@ -294,7 +278,7 @@ public abstract class IntegrationTestSuite {
    */
   protected String formatXml(Object value) throws JsonProcessingException, TransformerException {
     // Serialize object to XML string using XmlMapper
-    String xmlString = getXmlMapperInstance().writeValueAsString(value);
+    String xmlString = xmlMapper.writeValueAsString(value);
     // Format the XML string with pretty printing
     return formatXmlString(xmlString);
   }
@@ -319,8 +303,7 @@ public abstract class IntegrationTestSuite {
    */
   private String formatXmlString(String xmlString) throws TransformerException {
     StringWriter writer = new StringWriter();
-    getTransformerInstance()
-        .transform(new StreamSource(new StringReader(xmlString)), new StreamResult(writer));
+    transformer.transform(new StreamSource(new StringReader(xmlString)), new StreamResult(writer));
     return writer.toString();
   }
 

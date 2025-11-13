@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.util.Map;
 import org.example.integration.request.RestRequestBuilder;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 
 /** Test class to verify BaseControllerTest helper methods work correctly. */
 class IntegrationTestSuiteTest extends IntegrationTestSuite {
@@ -120,9 +120,53 @@ class IntegrationTestSuiteTest extends IntegrationTestSuite {
 
   @Test
   void testGetDefaultHeaders() {
-    MultiValueMap<String, String> headers = getDefaultHeaders();
+    HttpHeaders headers = getDefaultHeaders();
     assertNotNull(headers);
     assertEquals(MediaType.APPLICATION_JSON_VALUE, headers.getFirst("Content-Type"));
+  }
+
+  @Test
+  void testFormatJsonObject() throws JsonProcessingException {
+    TestObject obj = new TestObject("test", 123);
+    String formatted = formatJson(obj);
+    assertNotNull(formatted);
+    assertTrue(formatted.contains("test"));
+    assertTrue(formatted.contains("123"));
+    // Should be pretty printed (contain newlines)
+    assertTrue(formatted.contains("\n"));
+  }
+
+  @Test
+  void testFormatJsonString() throws JsonProcessingException {
+    String json = "{\"name\":\"test\",\"value\":123}";
+    String formatted = formatJson(json);
+    assertNotNull(formatted);
+    assertTrue(formatted.contains("test"));
+    assertTrue(formatted.contains("123"));
+    // Should be pretty printed (contain newlines)
+    assertTrue(formatted.contains("\n"));
+  }
+
+  @Test
+  void testFormatXmlObject() throws Exception {
+    TestObject obj = new TestObject("test", 123);
+    String formatted = formatXml(obj);
+    assertNotNull(formatted);
+    assertTrue(formatted.contains("test"));
+    assertTrue(formatted.contains("123"));
+    // Should be pretty printed (contain newlines)
+    assertTrue(formatted.contains("\n"));
+  }
+
+  @Test
+  void testFormatXmlString() throws Exception {
+    String xml = "<root><name>test</name><value>123</value></root>";
+    String formatted = formatXml(xml);
+    assertNotNull(formatted);
+    assertTrue(formatted.contains("test"));
+    assertTrue(formatted.contains("123"));
+    // Should be pretty printed (contain newlines)
+    assertTrue(formatted.contains("\n"));
   }
 
   // Helper class for testing
